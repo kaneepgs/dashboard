@@ -70,6 +70,7 @@ http://localhost:3000
 - `npm run dev` — start the Next.js local app
 - `npm run build` — production build check
 - `npm run start` — start the production server
+- `npm run preview:publish` — generate the hosted dashboard preview for OpenClaw canvas/documents
 
 ## Environment
 
@@ -92,3 +93,4 @@ See:
 - The frontend now targets a Next.js App Router structure so the dashboard can evolve more cleanly into a premium SaaS-style product.
 - Weekly reporting now has a lightweight persistence layer for Sunday summaries and trend comparisons.
 - Managed OpenClaw should be opened externally at `https://lightsteelblue-pheasant-697323.hostingersite.com`; the dashboard should not depend on embedding the Control UI.
+- The hosted review preview can be regenerated from live local runtime state with `npm run preview:publish`.
