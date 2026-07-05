@@ -1,0 +1,455 @@
+'use client';
+
+import { useEffect, useMemo, useState } from 'react';
+
+const NAV_ITEMS = [
+  'Overview',
+  'Rankings',
+  'Platform Drill-down',
+  'Reports',
+  'Competitors',
+  'Content Studio'
+];
+
+function formatNumber(value) {
+  return new Intl.NumberFormat('en-GB').format(value || 0);
+}
+
+function formatPct(value) {
+  return `${value || 0}%`;
+}
+
+function formatDate(value) {
+  return new Date(value).toLocaleString('en-GB', {
+    dateStyle: 'medium',
+    timeStyle: 'short'
+  });
+}
+
+function medal(rank) {
+  return rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : `#${rank}`;
+}
+
+function MetricCard({ label, value, suffix = '', tone = 'default' }) {
+  return (
+    <div className={`metric-card ${tone !== 'default' ? `metric-card-${tone}` : ''}`}>
+      <div className="metric-label">{label}</div>
+      <div className="metric-number">{formatNumber(value)}{suffix}</div>
+    </div>
+  );
+}
+
+function InsightBlock({ title, items }) {
+  return (
+    <div className="insight-block">
+      <h4>{title}</h4>
+      <ul>
+        {items.map(item => <li key={item}>{item}</li>)}
+      </ul>
+    </div>
+  );
+}
+
+export default function DashboardClient() {
+  const [overview, setOverview] = useState(null);
+  const [search, setSearch] = useState('');
+  const [selectedPlatform, setSelectedPlatform] = useState('');
+  const [paletteOpen, setPaletteOpen] = useState(false);
+  const [command, setCommand] = useState('');
+  const [commandResult, setCommandResult] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  async function loadOverview() {
+    const response = await fetch('/api/overview', { cache: 'no-store' });
+    const data = await response.json();
+    setOverview(data);
+    setSelectedPlatform(prev => prev || data.rankings?.[0]?.slug || '');
+  }
+
+  useEffect(() => {
+    loadOverview();
+  }, []);
+
+  const filteredRankings = useMemo(() => {
+    if (!overview) return [];
+    const q = search.trim().toLowerCase();
+    if (!q) return overview.rankings;
+    return overview.rankings.filter(platform => (
+      platform.name.toLowerCase().includes(q) || platform.slug.toLowerCase().includes(q)
+    ));
+  }, [overview, search]);
+
+  const selected = overview?.rankings.find(item => item.slug === selectedPlatform) || overview?.rankings?.[0];
+
+  async function handleRefresh() {
+    setRefreshing(true);
+    await fetch('/api/refresh', { method: 'POST' });
+    await loadOverview();
+    setRefreshing(false);
+  }
+
+  async function handleCommand() {
+    if (!command.trim()) return;
+    const response = await fetch('/api/command', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ command })
+    });
+    const data = await response.json();
+    setCommandResult(data.answer || 'No answer available.');
+  }
+
+  if (!overview) {
+    return (
+      <main className="loading-shell">
+        <div className="loading-card">
+          <div className="eyebrow">EP Golf Studios</div>
+          <h1>Loading Marketing Command Centre…</h1>
+        </div>
+      </main>
+    );
+  }
+
+  const socialPlatforms = overview.rankings.filter(platform => platform.slug !== 'ga4');
+  const actionTop = overview.actionQueue?.[0];
+  const website = overview.website;
+
+  return (
+    <>
+      <div className="app-shell">
+        <aside className="sidebar">
+          <div>
+            <div className="eyebrow">EP Golf Studios</div>
+            <h1>Marketing Command Centre</h1>
+            <p className="muted">AI-led marketing intelligence, reporting, and approval-first execution.</p>
+          </div>
+
+          <div className="sidebar-cta">
+            <div className="section-title">Primary objective</div>
+            <strong>Drive fitting bookings with high-trust, data-led marketing.</strong>
+            <p className="muted">Every recommendation stays in draft until approved.</p>
+          </div>
+
+          <nav className="nav-list">
+            {NAV_ITEMS.map((item, index) => (
+              <button key={item} className={`nav-item ${index === 0 ? 'active' : ''}`}>{item}</button>
+            ))}
+          </nav>
+
+          <div className="status-card">
+            <div className="section-title">System status</div>
+            <div className="metric-value">{overview.system.health}</div>
+            <div className="muted">{overview.system.refreshSchedule}</div>
+            <div className="muted">Last updated {formatDate(overview.system.lastUpdated)}</div>
+          </div>
+        </aside>
+
+        <main className="main-panel">
+          <header className="topbar">
+            <div>
+              <div className="eyebrow">Premium marketing intelligence platform</div>
+              <h2>Command view</h2>
+            </div>
+            <div className="topbar-actions">
+              <input
+                className="search"
+                placeholder="Search platforms, drafts, reports..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+              <button className="secondary-btn" onClick={() => setPaletteOpen(true)}>⌘ Command</button>
+              <button className="primary-btn" onClick={handleRefresh} disabled={refreshing}>
+                {refreshing ? 'Refreshing…' : 'Refresh now'}
+              </button>
+            </div>
+          </header>
+
+          <section className="hero-grid">
+            <div className="hero-card hero-card-large">
+              <div className="section-title">Marketing score</div>
+              <div className="score-display">{overview.insights.marketingScore}</div>
+              <div className="muted">{overview.insights.keyWins[0]}</div>
+            </div>
+
+            <div className="hero-card">
+              <div className="section-title">Last updated</div>
+              <div className="metric-value">{formatDate(overview.system.lastUpdated)}</div>
+              <div className="muted">Next scheduled refresh: {formatDate(overview.system.nextScheduledRefresh)}</div>
+            </div>
+
+            <div className="hero-card accent-card">
+              <div className="section-title">Priority action</div>
+              <div className="metric-value action-title">{actionTop?.title}</div>
+              <div className="muted">Impact: {actionTop?.estimatedImpact}</div>
+            </div>
+          </section>
+
+          <section className="cta-banner">
+            <div>
+              <div className="eyebrow">Primary conversion</div>
+              <h3>Build the week around fitting-booking demand.</h3>
+              <p className="muted">The UX and reporting are tuned toward premium fitting trust, measurable performance, and booking intent.</p>
+            </div>
+            <button className="primary-btn">Review booking CTAs</button>
+          </section>
+
+          <section className="content-grid">
+            <div className="panel span-2">
+              <div className="panel-head">
+                <h3>Social</h3>
+                <span className="badge">Visible defaults</span>
+              </div>
+              <div className="metric-grid">
+                <MetricCard label="Followers" value={overview.social.followers} tone="brand" />
+                <MetricCard label="Views" value={overview.social.views} />
+                <MetricCard label="Likes" value={overview.social.likes} />
+                <MetricCard label="Comments" value={overview.social.comments} />
+                <MetricCard label="Followers gained this week" value={overview.social.followersGained} />
+                <MetricCard label="Growth %" value={overview.social.growthPct} suffix="%" />
+              </div>
+              <div className="channel-chip-row">
+                {socialPlatforms.map(platform => (
+                  <span key={platform.slug} className="channel-chip">{platform.name}</span>
+                ))}
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Website</h3>
+                <span className="badge gold">GA4</span>
+              </div>
+              <div className="metric-grid single-column">
+                <MetricCard label="Website visitors" value={website.visitors} />
+                <MetricCard label="Email signups" value={website.emailSignups} />
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Platform rankings</h3>
+                <span className="badge">Weighted score</span>
+              </div>
+              <div className="ranking-list">
+                {filteredRankings.map(platform => (
+                  <div key={platform.slug} className="ranking-item">
+                    <div className="ranking-row">
+                      <div>
+                        <strong>{medal(platform.rank)} {platform.name}</strong>
+                        <div className="rank-meta">Trend: {platform.trend.direction} · Growth {formatPct(platform.metrics.growthPct)}</div>
+                      </div>
+                      <div className="rank-score">{platform.score}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="panel span-2">
+              <div className="panel-head">
+                <h3>AI Chief Marketing Officer</h3>
+                <span className="badge purple">Insight engine</span>
+              </div>
+              <div className="insight-columns">
+                <InsightBlock title="Key wins" items={overview.insights.keyWins} />
+                <InsightBlock title="Problems" items={overview.insights.problems} />
+                <InsightBlock title="Opportunities" items={overview.insights.opportunities} />
+                <InsightBlock title="Risks & forecast" items={[...overview.insights.risks, ...overview.insights.forecast]} />
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Recommended actions</h3>
+                <span className="badge red">Approval required</span>
+              </div>
+              <div className="report-stack">
+                {overview.actionQueue.map(action => (
+                  <div key={action.id} className="action-card">
+                    <div className="inline-between">
+                      <strong>{action.title}</strong>
+                      <span className="badge red">{action.status}</span>
+                    </div>
+                    <p className="muted soft-gap">{action.why}</p>
+                    <div className="rank-meta soft-gap">Confidence: {Math.round(action.confidence.score * 100)}% · Impact: {action.estimatedImpact}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="panel span-3">
+              <div className="panel-head">
+                <h3>Platform drill-down</h3>
+                <span className="badge">Interactive</span>
+              </div>
+              <div className="platform-tabs">
+                {overview.rankings.map(platform => (
+                  <button
+                    key={platform.slug}
+                    className={`tab-pill ${selected?.slug === platform.slug ? 'active' : ''}`}
+                    onClick={() => setSelectedPlatform(platform.slug)}
+                  >
+                    {platform.name}
+                  </button>
+                ))}
+              </div>
+
+              {selected && (
+                <div className="platform-detail">
+                  <div className="detail-grid">
+                    {[
+                      ['Followers', selected.metrics.followers || 0],
+                      ['Views', selected.metrics.views || selected.metrics.visitors || 0],
+                      ['Likes', selected.metrics.likes || 0],
+                      ['Comments', selected.metrics.comments || 0],
+                      ['Followers gained', selected.metrics.followersGained || 0],
+                      ['Growth %', selected.metrics.growthPct || 0],
+                      ['Engagement %', selected.metrics.engagementRate || 0],
+                      ['Reach', selected.metrics.reach || 0],
+                      ['Impressions', selected.metrics.impressions || 0],
+                      ['CTR %', selected.metrics.ctr || 0],
+                      ['Watch time hours', selected.metrics.watchTimeHours || 0],
+                      ['Retention %', selected.metrics.retentionPct || 0],
+                      ['Visitors', selected.metrics.visitors || 0],
+                      ['Email signups', selected.metrics.emailSignups || 0]
+                    ].filter(([, value]) => value !== 0).map(([label, value]) => (
+                      <MetricCard key={label} label={label} value={value} />
+                    ))}
+                  </div>
+
+                  <div className="detail-grid">
+                    <div className="detail-list">
+                      <h4>Best content</h4>
+                      <ul>
+                        {selected.topContent.map(item => (
+                          <li key={`${item.title}-${item.publishedAt}`}>{item.title} — {formatNumber(item.views)} views</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="detail-list">
+                      <h4>Worst content</h4>
+                      <ul>
+                        {selected.lowContent.map(item => (
+                          <li key={`${item.title}-${item.publishedAt}`}>{item.title} — {formatNumber(item.views)} views</li>
+                        ))}
+                      </ul>
+                    </div>
+
+                    <div className="detail-list">
+                      <h4>Audience insights</h4>
+                      <ul>
+                        {selected.audienceInsights.map(item => <li key={item}>{item}</li>)}
+                      </ul>
+                    </div>
+
+                    <div className="detail-list">
+                      <h4>Traffic & timing</h4>
+                      <ul>
+                        <li><strong>Traffic sources:</strong> {selected.trafficSources.join(', ') || 'N/A'}</li>
+                        <li><strong>Search terms:</strong> {selected.searchTerms.join(', ') || 'N/A'}</li>
+                        <li><strong>Best posting times:</strong> {selected.postingTimes.join(', ') || 'N/A'}</li>
+                        <li><strong>Connector:</strong> {selected.connector.mode} / {selected.connector.health}</li>
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <div className="panel span-2">
+              <div className="panel-head">
+                <h3>Reports</h3>
+                <span className="badge">Daily / Weekly / Monthly</span>
+              </div>
+              <div className="report-stack">
+                {Object.values(overview.reports)
+                  .filter(item => typeof item === 'object' && item?.title)
+                  .map(report => (
+                    <div key={report.title} className="report-card">
+                      <strong>{report.title}</strong>
+                      <ul>
+                        {Object.entries(report)
+                          .filter(([key]) => key !== 'title')
+                          .slice(0, 4)
+                          .map(([key, value]) => {
+                            const text = Array.isArray(value)
+                              ? value[0]
+                              : typeof value === 'string'
+                                ? value
+                                : JSON.stringify(value?.[0] || value);
+                            return <li key={key}><strong>{key}:</strong> {text}</li>;
+                          })}
+                      </ul>
+                    </div>
+                  ))}
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Competitor intelligence</h3>
+                <span className="badge">Watchlist</span>
+              </div>
+              <div className="detail-list">
+                <h4>Tracked competitors</h4>
+                <p className="muted">{overview.competitor.trackedCompetitors.join(' · ')}</p>
+                <ul>
+                  {overview.competitor.highlights.map(item => <li key={item}>{item}</li>)}
+                </ul>
+                <h4 className="soft-gap-lg">Content gaps</h4>
+                <ul>
+                  {overview.competitor.gaps.map(item => <li key={item}>{item}</li>)}
+                </ul>
+                <h4 className="soft-gap-lg">Trending topics</h4>
+                <ul>
+                  {overview.competitor.trendingTopics.map(item => <li key={item}>{item}</li>)}
+                </ul>
+              </div>
+            </div>
+
+            <div className="panel span-3">
+              <div className="panel-head">
+                <h3>Content Studio</h3>
+                <span className="badge purple">Drafts only</span>
+              </div>
+              <div className="draft-grid">
+                {overview.drafts.map(draft => (
+                  <div key={draft.id} className="draft-card">
+                    <div className="inline-between">
+                      <strong>{draft.type}</strong>
+                      <span className="badge purple">{draft.status}</span>
+                    </div>
+                    <div className="rank-meta">{draft.platform}</div>
+                    <p className="soft-gap">{draft.content}</p>
+                    <p className="muted soft-gap">{draft.rationale}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+        </main>
+      </div>
+
+      {paletteOpen && (
+        <div className="command-palette">
+          <div className="command-modal">
+            <div className="panel-head">
+              <h3>AI command assistant</h3>
+              <button className="ghost-btn" onClick={() => setPaletteOpen(false)}>Close</button>
+            </div>
+            <input
+              className="command-input"
+              placeholder="Ask: Which platform is winning? What should we do next?"
+              value={command}
+              onChange={(event) => setCommand(event.target.value)}
+            />
+            <button className="primary-btn full-width" onClick={handleCommand}>Run command</button>
+            <div className="command-result muted">{commandResult}</div>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+

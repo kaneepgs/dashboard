@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Marketing Command Centre</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div>
+          <div class="eyebrow">EP Golf Studios</div>
+          <h1>Marketing Command Centre</h1>
+          <p class="muted">AI-led marketing intelligence, reporting, and approval-first execution.</p>
+        </div>
+        <nav class="nav-list">
+          <button class="nav-item active" data-section="overview">Overview</button>
+          <button class="nav-item" data-section="rankings">Rankings</button>
+          <button class="nav-item" data-section="platforms">Platform Drill-down</button>
+          <button class="nav-item" data-section="reports">Reports</button>
+          <button class="nav-item" data-section="competitors">Competitors</button>
+          <button class="nav-item" data-section="studio">Content Studio</button>
+        </nav>
+        <div class="status-card" id="systemStatus"></div>
+      </aside>
+
+      <main class="main-panel">
+        <header class="topbar">
+          <div>
+            <div class="eyebrow">Premium marketing intelligence platform</div>
+            <h2>Command view</h2>
+          </div>
+          <div class="topbar-actions">
+            <input id="searchInput" class="search" placeholder="Search platforms, drafts, reports..." />
+            <button id="commandButton" class="secondary-btn">⌘ Command</button>
+            <button id="refreshButton" class="primary-btn">Refresh now</button>
+          </div>
+        </header>
+
+        <section class="hero-grid">
+          <div class="hero-card hero-card-large">
+            <div class="section-title">Marketing score</div>
+            <div id="marketingScore" class="score-display">--</div>
+            <div id="scoreNarrative" class="muted"></div>
+          </div>
+          <div class="hero-card">
+            <div class="section-title">Last updated</div>
+            <div id="lastUpdated" class="metric-value">--</div>
+            <div id="nextRefresh" class="muted"></div>
+          </div>
+          <div class="hero-card">
+            <div class="section-title">Approval mode</div>
+            <div id="approvalMode" class="metric-value">Draft only</div>
+            <div class="muted">Publisher never auto-executes.</div>
+          </div>
+        </section>
+
+        <section class="content-grid">
+          <div class="panel span-2">
+            <div class="panel-head">
+              <h3>SOCIAL</h3>
+              <span class="badge">Live-ready</span>
+            </div>
+            <div id="socialKpis" class="metric-grid"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>WEBSITE</h3>
+              <span class="badge gold">GA4</span>
+            </div>
+            <div id="websiteKpis" class="metric-grid single-column"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Platform rankings</h3>
+              <span class="badge">Weighted score</span>
+            </div>
+            <div id="rankingsList" class="ranking-list"></div>
+          </div>
+          <div class="panel span-2">
+            <div class="panel-head">
+              <h3>AI Chief Marketing Officer</h3>
+              <span class="badge purple">Insight engine</span>
+            </div>
+            <div id="insightsPanel" class="insight-columns"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Recommended actions</h3>
+              <span class="badge red">Approval required</span>
+            </div>
+            <div id="actionQueue"></div>
+          </div>
+          <div class="panel span-3">
+            <div class="panel-head">
+              <h3>Platform drill-down</h3>
+              <span class="badge">Interactive</span>
+            </div>
+            <div id="platformTabs" class="platform-tabs"></div>
+            <div id="platformDetail" class="platform-detail"></div>
+          </div>
+          <div class="panel span-2">
+            <div class="panel-head">
+              <h3>Reports</h3>
+              <span class="badge">Daily / Weekly / Monthly</span>
+            </div>
+            <div id="reportsPanel" class="report-stack"></div>
+          </div>
+          <div class="panel">
+            <div class="panel-head">
+              <h3>Competitor intelligence</h3>
+              <span class="badge">Watchlist</span>
+            </div>
+            <div id="competitorPanel"></div>
+          </div>
+          <div class="panel span-3">
+            <div class="panel-head">
+              <h3>Content Studio</h3>
+              <span class="badge purple">Drafts only</span>
+            </div>
+            <div id="draftPanel" class="draft-grid"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div id="commandPalette" class="command-palette hidden">
+      <div class="command-modal">
+        <div class="panel-head">
+          <h3>AI command assistant</h3>
+          <button id="closePalette" class="ghost-btn">Close</button>
+        </div>
+        <input id="commandInput" class="command-input" placeholder="Ask: Which platform is winning? What should we do next?" />
+        <button id="runCommand" class="primary-btn full-width">Run command</button>
+        <div id="commandResult" class="command-result muted"></div>
+      </div>
+    </div>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
