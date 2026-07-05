@@ -11,6 +11,8 @@ const NAV_ITEMS = [
   'Content Studio'
 ];
 
+const OPENCLAW_URL = 'https://lightsteelblue-pheasant-697323.hostingersite.com';
+
 function formatNumber(value) {
   return new Intl.NumberFormat('en-GB').format(value || 0);
 }
@@ -172,6 +174,7 @@ export default function DashboardClient() {
                 value={search}
                 onChange={(event) => setSearch(event.target.value)}
               />
+              <a className="secondary-btn" href={OPENCLAW_URL} target="_blank" rel="noreferrer">Open OpenClaw ↗</a>
               <button className="secondary-btn" onClick={() => setPaletteOpen(true)}>⌘ Command</button>
               <button className="primary-btn" onClick={handleRefresh} disabled={refreshing}>
                 {refreshing ? 'Refreshing…' : 'Refresh now'}
@@ -204,8 +207,12 @@ export default function DashboardClient() {
               <div className="eyebrow">Primary conversion</div>
               <h3>Build the week around fitting-booking demand.</h3>
               <p className="muted">The UX and reporting are tuned toward premium fitting trust, measurable performance, and booking intent.</p>
+              <p className="muted">Managed OpenClaw now sits alongside this dashboard as a separate tool — launch it in a new tab when you want the full control workspace.</p>
             </div>
-            <button className="primary-btn">Review booking CTAs</button>
+            <div className="topbar-actions">
+              <a className="secondary-btn" href={OPENCLAW_URL} target="_blank" rel="noreferrer">Open OpenClaw ↗</a>
+              <button className="primary-btn">Review booking CTAs</button>
+            </div>
           </section>
 
           <section className="content-grid">

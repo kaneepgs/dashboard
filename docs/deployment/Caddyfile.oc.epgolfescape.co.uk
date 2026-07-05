@@ -1,10 +1,7 @@
-oc.epgolfescape.co.uk {
-    encode gzip zstd
-
-    reverse_proxy 127.0.0.1:18789 {
-        header_up Host {host}
-        header_up X-Forwarded-Host {host}
-        header_up X-Forwarded-Proto https
-        header_up X-Forwarded-For {remote_host}
-    }
-}
+# Deprecated for this project direction.
+#
+# EP Golf dashboard now targets Hostinger Managed OpenClaw and should open it
+# externally instead of relying on a custom-domain reverse proxy.
+#
+# Launch URL:
+# https://lightsteelblue-pheasant-697323.hostingersite.com

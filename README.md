@@ -49,6 +49,7 @@ Historical reporting status:
 - Weekly reports can now build from captured history instead of only the current state
 - The dashboard UI now surfaces a weekly command-centre layer, snapshot timeline, and score-movement view
 - A dedicated Sunday Summary output is now available in-app and via `GET /api/sunday-summary`
+- Managed OpenClaw is treated as a separate external workspace, launched from the dashboard via an `Open OpenClaw` link instead of an embedded iframe
 
 ## Quick start
 
@@ -90,3 +91,4 @@ See:
 - Visible dashboard defaults should be Website / GA4, YouTube, Instagram, Facebook, and LinkedIn.
 - The frontend now targets a Next.js App Router structure so the dashboard can evolve more cleanly into a premium SaaS-style product.
 - Weekly reporting now has a lightweight persistence layer for Sunday summaries and trend comparisons.
+- Managed OpenClaw should be opened externally at `https://lightsteelblue-pheasant-697323.hostingersite.com`; the dashboard should not depend on embedding the Control UI.
