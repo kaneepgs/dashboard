@@ -658,8 +658,24 @@ export default function DashboardClient() {
                       <span className="badge purple">{draft.status}</span>
                     </div>
                     <div className="rank-meta">{draft.platform}</div>
-                    <p className="soft-gap">{draft.content}</p>
+                    <p className="soft-gap"><strong>{draft.content}</strong></p>
+                    <p className="muted soft-gap">{draft.body}</p>
+                    <div className="detail-list draft-pack soft-gap">
+                      <ul>
+                        <li><strong>CTA:</strong> {draft.cta}</li>
+                        <li><strong>Asset brief:</strong> {draft.assetBrief}</li>
+                        <li><strong>Repurpose note:</strong> {draft.repurposeNote}</li>
+                      </ul>
+                    </div>
                     <p className="muted soft-gap">{draft.rationale}</p>
+                    <div className="action-controls soft-gap">
+                      <button className="secondary-btn" onClick={() => handleCopy(`${draft.id}-headline`, draft.content)}>
+                        {copiedKey === `${draft.id}-headline` ? 'Copied' : 'Copy headline'}
+                      </button>
+                      <button className="secondary-btn" onClick={() => handleCopy(`${draft.id}-pack`, draft.copyPack.combined)}>
+                        {copiedKey === `${draft.id}-pack` ? 'Copied' : 'Copy full pack'}
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

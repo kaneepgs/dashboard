@@ -343,6 +343,12 @@ h4 {
   flex-wrap: wrap;
 }
 
+.draft-pack {
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
 .timeline-grid {
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
 }

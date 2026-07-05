@@ -488,7 +488,13 @@ function buildHtml(overview) {
                 <span class="badge purple">${escapeHtml(draft.status)}</span>
               </div>
               <div class="rank-meta">${escapeHtml(draft.platform)}</div>
-              <p class="soft-gap">${escapeHtml(draft.content)}</p>
+              <p class="soft-gap"><strong>${escapeHtml(draft.content)}</strong></p>
+              <p class="muted soft-gap">${escapeHtml(draft.body || '')}</p>
+              <ul>
+                <li><strong>CTA:</strong> ${escapeHtml(draft.cta || '')}</li>
+                <li><strong>Asset brief:</strong> ${escapeHtml(draft.assetBrief || '')}</li>
+                <li><strong>Repurpose note:</strong> ${escapeHtml(draft.repurposeNote || '')}</li>
+              </ul>
               <p class="muted soft-gap">${escapeHtml(draft.rationale)}</p>
             </div>
           `).join('')}

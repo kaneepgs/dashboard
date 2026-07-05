@@ -51,6 +51,7 @@ Historical reporting status:
 - A dedicated Sunday Summary output is now available in-app and via `GET /api/sunday-summary`
 - A reusable Sunday Summary pack is now available in-app and via `GET /api/sunday-summary-pack`
 - Action approvals now persist locally, with in-product approve / revert controls and `PATCH /api/actions/:actionId`
+- Content Studio drafts now expose reusable copy-pack fields in-app and via `GET /api/content-pack`
 - Managed OpenClaw is treated as a separate external workspace, launched from the dashboard via an `Open OpenClaw` link instead of an embedded iframe
 
 ## Quick start

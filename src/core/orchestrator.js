@@ -46,6 +46,7 @@ async function buildState(now = new Date().toISOString()) {
     insights,
     competitor,
     drafts,
+    contentPack: contentStudio.buildPack(drafts),
     reports,
     actionQueue,
     overview,
@@ -85,6 +86,7 @@ export const orchestrator = {
   getDrafts(state) {
     return {
       contentDrafts: state.drafts,
+      contentPack: state.contentPack,
       actionQueue: state.actionQueue
     };
   },
