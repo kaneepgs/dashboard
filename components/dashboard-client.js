@@ -73,6 +73,7 @@ export default function DashboardClient() {
   const [commandResult, setCommandResult] = useState('');
   const [refreshing, setRefreshing] = useState(false);
   const [copiedKey, setCopiedKey] = useState('');
+  const [actionUpdating, setActionUpdating] = useState('');
 
   async function loadOverview() {
     const response = await fetch('/api/overview', { cache: 'no-store' });
@@ -119,6 +120,17 @@ export default function DashboardClient() {
     await navigator.clipboard.writeText(value);
     setCopiedKey(key);
     window.setTimeout(() => setCopiedKey(current => current === key ? '' : current), 1800);
+  }
+
+  async function handleActionStatus(actionId, status) {
+    setActionUpdating(actionId);
+    await fetch(`/api/actions/${actionId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status })
+    });
+    await loadOverview();
+    setActionUpdating('');
   }
 
   if (!overview) {
@@ -208,6 +220,9 @@ export default function DashboardClient() {
               <div className="section-title">Priority action</div>
               <div className="metric-value action-title">{actionTop?.title}</div>
               <div className="muted">Impact: {actionTop?.estimatedImpact}</div>
+              <div className="soft-gap">
+                <span className={`badge ${actionTop?.status === 'Approved' ? 'green' : 'red'}`}>{actionTop?.status || 'Draft'}</span>
+              </div>
             </div>
           </section>
 
@@ -395,10 +410,32 @@ export default function DashboardClient() {
                   <div key={action.id} className="action-card">
                     <div className="inline-between">
                       <strong>{action.title}</strong>
-                      <span className="badge red">{action.status}</span>
+                      <span className={`badge ${action.status === 'Approved' ? 'green' : 'red'}`}>{action.status}</span>
                     </div>
                     <p className="muted soft-gap">{action.why}</p>
                     <div className="rank-meta soft-gap">Confidence: {Math.round(action.confidence.score * 100)}% · Impact: {action.estimatedImpact}</div>
+                    {action.approvedAt && (
+                      <div className="rank-meta soft-gap">Approved at {formatDate(action.approvedAt)}</div>
+                    )}
+                    <div className="action-controls soft-gap">
+                      {action.status !== 'Approved' ? (
+                        <button
+                          className="primary-btn"
+                          onClick={() => handleActionStatus(action.id, 'Approved')}
+                          disabled={actionUpdating === action.id}
+                        >
+                          {actionUpdating === action.id ? 'Updating…' : 'Approve action'}
+                        </button>
+                      ) : (
+                        <button
+                          className="secondary-btn"
+                          onClick={() => handleActionStatus(action.id, 'Draft')}
+                          disabled={actionUpdating === action.id}
+                        >
+                          {actionUpdating === action.id ? 'Updating…' : 'Move back to draft'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

@@ -227,6 +227,7 @@ function buildHtml(overview) {
     .badge { border: 1px solid var(--border); border-radius: 999px; padding: 6px 10px; font-size: 12px; color: var(--muted); }
     .badge.gold { background: linear-gradient(135deg, #d6b25e, #b78628); border-color: transparent; color: #091220; }
     .badge.red { background: rgba(248,113,113,0.12); color: #ffd9d9; }
+    .badge.green { background: rgba(34,197,94,0.15); color: #bbf7d0; }
     .badge.purple { background: rgba(183,148,244,0.12); color: #f2e8ff; }
     .secondary-btn, .primary-btn { border: 1px solid var(--border); border-radius: 14px; padding: 12px 14px; font-weight: 700; }
     .secondary-btn { background: rgba(255,255,255,0.03); }
@@ -284,6 +285,7 @@ function buildHtml(overview) {
         <div class="eyebrow">Priority action</div>
         <div class="metric-value action-title">${escapeHtml(topAction?.title || 'No action')}</div>
         <div class="muted soft-gap">Impact: ${escapeHtml(topAction?.estimatedImpact || 'N/A')}</div>
+        <div class="soft-gap"><span class="badge ${topAction?.status === 'Approved' ? 'green' : 'red'}">${escapeHtml(topAction?.status || 'Draft')}</span></div>
       </div>
     </div>
 
@@ -420,10 +422,11 @@ function buildHtml(overview) {
             <div class="action-card">
               <div class="inline-between">
                 <strong>${escapeHtml(action.title)}</strong>
-                <span class="badge red">${escapeHtml(action.status)}</span>
+                <span class="badge ${action.status === 'Approved' ? 'green' : 'red'}">${escapeHtml(action.status)}</span>
               </div>
               <p class="muted soft-gap">${escapeHtml(action.why)}</p>
               <div class="rank-meta soft-gap">Confidence: ${escapeHtml(Math.round((action.confidence?.score || 0) * 100))}% · Impact: ${escapeHtml(action.estimatedImpact)}</div>
+              ${action.approvedAt ? `<div class="rank-meta soft-gap">Approved at ${escapeHtml(formatDate(action.approvedAt))}</div>` : ''}
             </div>
           `).join('')}
         </div>

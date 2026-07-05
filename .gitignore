@@ -6,3 +6,4 @@ dist/
 build/
 coverage/
 data/weekly-snapshots.json
+data/action-approvals.json

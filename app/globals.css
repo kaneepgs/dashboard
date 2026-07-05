@@ -281,6 +281,11 @@ h4 {
   color: #fecaca;
 }
 
+.badge.green {
+  background: rgba(34, 197, 94, 0.15);
+  color: #bbf7d0;
+}
+
 .metric-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -330,6 +335,12 @@ h4 {
 .timeline-grid {
   display: grid;
   gap: 12px;
+}
+
+.action-controls {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .timeline-grid {

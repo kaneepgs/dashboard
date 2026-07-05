@@ -31,7 +31,7 @@ async function buildState(now = new Date().toISOString()) {
   const insights = aiCmo.explain(rankedPlatforms);
   const competitor = competitorIntelligence.build();
   const drafts = contentStudio.draft(rankedPlatforms);
-  const actionQueue = publisher.buildDraftQueue(insights.recommendedActions);
+  const actionQueue = await publisher.buildDraftQueue(insights.recommendedActions);
   const system = buildSystem(now);
 
   await persistDailySnapshot({ system, rankedPlatforms, insights });
