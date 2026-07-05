@@ -74,6 +74,7 @@ export default function DashboardClient() {
   const [refreshing, setRefreshing] = useState(false);
   const [copiedKey, setCopiedKey] = useState('');
   const [actionUpdating, setActionUpdating] = useState('');
+  const [loggingOut, setLoggingOut] = useState(false);
 
   async function loadOverview() {
     const response = await fetch('/api/overview', { cache: 'no-store' });
@@ -131,6 +132,12 @@ export default function DashboardClient() {
     });
     await loadOverview();
     setActionUpdating('');
+  }
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = '/login';
   }
 
   if (!overview) {
@@ -198,6 +205,9 @@ export default function DashboardClient() {
               />
               <a className="secondary-btn" href={OPENCLAW_URL} target="_blank" rel="noreferrer">Open OpenClaw ↗</a>
               <button className="secondary-btn" onClick={() => setPaletteOpen(true)}>⌘ Command</button>
+              <button className="secondary-btn" onClick={handleLogout} disabled={loggingOut}>
+                {loggingOut ? 'Logging out…' : 'Log out'}
+              </button>
               <button className="primary-btn" onClick={handleRefresh} disabled={refreshing}>
                 {refreshing ? 'Refreshing…' : 'Refresh now'}
               </button>

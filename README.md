@@ -80,6 +80,12 @@ http://localhost:3000
 
 Copy `.env.example` to `.env` and add credentials when ready.
 
+For a private deploy, set:
+
+- `DASHBOARD_ACCESS_PASSWORD=your-password`
+
+That enables a normal dashboard login page and cookie-based access flow, separate from OpenClaw gateway-token auth.
+
 See `CREDENTIALS-CHECKLIST.md` for the phased credential format.
 
 ## Architecture
@@ -98,3 +104,4 @@ See:
 - Weekly reporting now has a lightweight persistence layer for Sunday summaries and trend comparisons.
 - Managed OpenClaw should be opened externally at `https://lightsteelblue-pheasant-697323.hostingersite.com`; the dashboard should not depend on embedding the Control UI.
 - The hosted review preview can be regenerated from live local runtime state with `npm run preview:publish`.
+- A private deploy can now use the app’s own password gate instead of OpenClaw gateway-token auth.

@@ -44,6 +44,10 @@ button, input {
   box-shadow: var(--shadow);
 }
 
+.login-card {
+  width: min(560px, 100%);
+}
+
 .app-shell {
   min-height: 100vh;
   display: grid;
@@ -454,6 +458,19 @@ h4 {
 .command-result,
 .soft-gap {
   margin-top: 10px;
+}
+
+.login-form {
+  display: grid;
+  gap: 16px;
+}
+
+.login-error {
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+  border-radius: 14px;
+  padding: 12px 14px;
 }
 
 .soft-gap-lg {
