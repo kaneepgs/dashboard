@@ -26,6 +26,18 @@ function formatDate(value) {
   });
 }
 
+function formatShortDate(value) {
+  return new Date(value).toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short'
+  });
+}
+
+function formatSigned(value, suffix = '') {
+  if (!value) return `0${suffix}`;
+  return `${value > 0 ? '+' : ''}${value}${suffix}`;
+}
+
 function medal(rank) {
   return rank <= 3 ? ['🥇', '🥈', '🥉'][rank - 1] : `#${rank}`;
 }
@@ -113,6 +125,8 @@ export default function DashboardClient() {
   const socialPlatforms = overview.rankings.filter(platform => platform.slug !== 'ga4');
   const actionTop = overview.actionQueue?.[0];
   const website = overview.website;
+  const history = overview.history;
+  const weeklyFocus = overview.weeklyFocus;
 
   return (
     <>
@@ -194,6 +208,97 @@ export default function DashboardClient() {
           </section>
 
           <section className="content-grid">
+            <div className="panel span-3">
+              <div className="panel-head">
+                <h3>Weekly command centre</h3>
+                <span className="badge gold">Sunday summary ready</span>
+              </div>
+              <div className="detail-grid weekly-grid">
+                <div className="detail-list">
+                  <h4>Weekly summary</h4>
+                  <p className="muted soft-gap">{weeklyFocus.summary}</p>
+                  <ul>
+                    <li><strong>Coverage:</strong> {weeklyFocus.coverageDays} captured day(s)</li>
+                    <li><strong>Latest snapshot:</strong> {history.latestSnapshotAt ? formatDate(history.latestSnapshotAt) : 'Not captured yet'}</li>
+                    <li><strong>Marketing score move:</strong> {formatSigned(history.marketingScoreDelta)}</li>
+                    <li><strong>Visitor move:</strong> {formatSigned(history.visitorDelta)}</li>
+                  </ul>
+                </div>
+
+                <div className="detail-list">
+                  <h4>Website trend</h4>
+                  <ul>
+                    <li><strong>Current visitors:</strong> {formatNumber(weeklyFocus.websiteTrend.currentVisitors)}</li>
+                    <li><strong>Peak visitors:</strong> {formatNumber(weeklyFocus.websiteTrend.peakVisitors)}</li>
+                    <li><strong>Average visitors:</strong> {formatNumber(weeklyFocus.websiteTrend.averageVisitors)}</li>
+                  </ul>
+                </div>
+
+                <div className="detail-list">
+                  <h4>Social trend</h4>
+                  <ul>
+                    <li><strong>Latest growth:</strong> {formatPct(weeklyFocus.socialTrend.latestGrowthPct)}</li>
+                    <li><strong>Average growth:</strong> {formatPct(weeklyFocus.socialTrend.averageGrowthPct)}</li>
+                    {weeklyFocus.trendNarrative.map(item => <li key={item}>{item}</li>)}
+                  </ul>
+                </div>
+
+                <div className="detail-list">
+                  <h4>Action plan</h4>
+                  <ul>
+                    {weeklyFocus.actionPlan.slice(0, 3).map(action => (
+                      <li key={action.title}><strong>{action.title}</strong> — {action.estimatedImpact}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="panel span-2">
+              <div className="panel-head">
+                <h3>Snapshot timeline</h3>
+                <span className="badge">History-backed</span>
+              </div>
+              <div className="timeline-grid">
+                {history.timeline.map(item => (
+                  <div key={item.capturedAt} className="report-card timeline-card">
+                    <div className="inline-between">
+                      <strong>{formatShortDate(item.capturedAt)}</strong>
+                      <span className="badge">Score {item.marketingScore}</span>
+                    </div>
+                    <div className="rank-meta soft-gap">Leader: {item.leader}</div>
+                    <div className="timeline-metrics soft-gap">
+                      <span>Visitors {formatNumber(item.visitors)}</span>
+                      <span>Social growth {formatPct(item.socialGrowthPct)}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Score movement</h3>
+                <span className="badge purple">Week-on-week</span>
+              </div>
+              <div className="report-stack">
+                {weeklyFocus.scoreChanges.length > 0 ? weeklyFocus.scoreChanges.map(item => (
+                  <div key={item.name} className="action-card">
+                    <div className="inline-between">
+                      <strong>{item.name}</strong>
+                      <span className="badge">{formatSigned(item.scoreDelta)}</span>
+                    </div>
+                    <div className="rank-meta soft-gap">Score {item.startScore} → {item.endScore}</div>
+                    <p className="muted soft-gap">Growth move: {formatSigned(item.growthDelta, '%')}</p>
+                  </div>
+                )) : (
+                  <div className="detail-list">
+                    <p className="muted">More snapshots will unlock proper week-on-week movement here.</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div className="panel span-2">
               <div className="panel-head">
                 <h3>Social</h3>
@@ -363,26 +468,35 @@ export default function DashboardClient() {
                 <span className="badge">Daily / Weekly / Monthly</span>
               </div>
               <div className="report-stack">
-                {Object.values(overview.reports)
-                  .filter(item => typeof item === 'object' && item?.title)
-                  .map(report => (
-                    <div key={report.title} className="report-card">
-                      <strong>{report.title}</strong>
-                      <ul>
-                        {Object.entries(report)
-                          .filter(([key]) => key !== 'title')
-                          .slice(0, 4)
-                          .map(([key, value]) => {
-                            const text = Array.isArray(value)
-                              ? value[0]
-                              : typeof value === 'string'
-                                ? value
-                                : JSON.stringify(value?.[0] || value);
-                            return <li key={key}><strong>{key}:</strong> {text}</li>;
-                          })}
-                      </ul>
-                    </div>
-                  ))}
+                <div className="report-card">
+                  <strong>{overview.reports.daily.title}</strong>
+                  <ul>
+                    <li><strong>Marketing score:</strong> {overview.reports.daily.marketingScore}</li>
+                    <li><strong>Top win:</strong> {overview.reports.daily.keyWins[0]}</li>
+                    <li><strong>Top problem:</strong> {overview.reports.daily.problems[0]}</li>
+                    <li><strong>Recommended:</strong> {overview.reports.daily.recommendedActions[0]?.title}</li>
+                  </ul>
+                </div>
+
+                <div className="report-card">
+                  <strong>{overview.reports.weekly.title}</strong>
+                  <ul>
+                    <li><strong>Summary:</strong> {overview.reports.weekly.summary}</li>
+                    <li><strong>Coverage:</strong> {overview.reports.weekly.coverageDays} day(s)</li>
+                    <li><strong>Strongest mover:</strong> {overview.reports.weekly.trendNarrative[0]}</li>
+                    <li><strong>Weakest mover:</strong> {overview.reports.weekly.trendNarrative[1]}</li>
+                  </ul>
+                </div>
+
+                <div className="report-card">
+                  <strong>{overview.reports.monthly.title}</strong>
+                  <ul>
+                    <li><strong>Executive view:</strong> {overview.reports.monthly.executiveView}</li>
+                    <li><strong>Priority 1:</strong> {overview.reports.monthly.priorities[0]}</li>
+                    <li><strong>Priority 2:</strong> {overview.reports.monthly.priorities[1]}</li>
+                    <li><strong>History coverage:</strong> {overview.reports.monthly.historyCoverageDays} day(s)</li>
+                  </ul>
+                </div>
               </div>
             </div>
 

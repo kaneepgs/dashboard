@@ -72,6 +72,13 @@ export const orchestrator = {
   getReports(state) {
     return state.reports;
   },
+  getHistory(state) {
+    return {
+      history: state.snapshotHistory,
+      summary: state.overview.history,
+      weeklyFocus: state.overview.weeklyFocus
+    };
+  },
   getDrafts(state) {
     return {
       contentDrafts: state.drafts,

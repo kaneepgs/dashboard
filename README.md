@@ -47,6 +47,7 @@ Historical reporting status:
 
 - Daily snapshots now persist locally in `data/weekly-snapshots.json`
 - Weekly reports can now build from captured history instead of only the current state
+- The dashboard UI now surfaces a weekly command-centre layer, snapshot timeline, and score-movement view
 
 ## Quick start
 

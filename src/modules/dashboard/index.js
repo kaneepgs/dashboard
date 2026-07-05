@@ -1,7 +1,34 @@
+function buildHistorySummary(snapshotHistory = []) {
+  const lastSeven = snapshotHistory.slice(-7);
+  const latest = lastSeven[lastSeven.length - 1];
+  const previous = lastSeven[lastSeven.length - 2];
+
+  return {
+    totalSnapshots: snapshotHistory.length,
+    coverageDays: lastSeven.length,
+    latestSnapshotAt: latest?.capturedAt || null,
+    dateRange: lastSeven.length ? {
+      start: lastSeven[0].capturedAt,
+      end: latest.capturedAt
+    } : null,
+    marketingScoreDelta: latest && previous ? Number((latest.marketingScore - previous.marketingScore).toFixed(1)) : 0,
+    visitorDelta: latest && previous ? (latest.website?.visitors || 0) - (previous.website?.visitors || 0) : 0,
+    timeline: lastSeven.map(snapshot => ({
+      dateKey: snapshot.dateKey,
+      capturedAt: snapshot.capturedAt,
+      marketingScore: snapshot.marketingScore,
+      visitors: snapshot.website?.visitors || 0,
+      socialGrowthPct: snapshot.social?.growthPct || 0,
+      leader: snapshot.leader?.name || 'N/A'
+    }))
+  };
+}
+
 export const dashboard = {
-  buildOverview(system, rankedPlatforms, insights, competitor, reports, drafts, actionQueue) {
+  buildOverview(system, rankedPlatforms, insights, competitor, reports, drafts, actionQueue, snapshotHistory = []) {
     const socialPlatforms = rankedPlatforms.filter(p => p.slug !== 'ga4');
     const website = rankedPlatforms.find(p => p.slug === 'ga4');
+    const history = buildHistorySummary(snapshotHistory);
 
     return {
       brand: 'EP Golf Studios',
@@ -17,6 +44,16 @@ export const dashboard = {
       website: {
         visitors: website.metrics.visitors || website.metrics.views,
         emailSignups: website.metrics.emailSignups || 0
+      },
+      history,
+      weeklyFocus: {
+        summary: reports.weekly.summary,
+        coverageDays: reports.weekly.coverageDays,
+        websiteTrend: reports.weekly.websiteTrend,
+        socialTrend: reports.weekly.socialTrend,
+        trendNarrative: reports.weekly.trendNarrative,
+        scoreChanges: reports.weekly.scoreChanges,
+        actionPlan: reports.weekly.actionPlan
       },
       rankings: rankedPlatforms,
       insights,
