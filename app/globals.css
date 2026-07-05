@@ -340,6 +340,12 @@ h4 {
   min-height: 120px;
 }
 
+.sunday-summary-card {
+  margin-bottom: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(199, 160, 90, 0.16), rgba(116, 47, 196, 0.16));
+}
+
 .timeline-metrics {
   display: grid;
   gap: 6px;

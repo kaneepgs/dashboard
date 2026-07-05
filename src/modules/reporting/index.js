@@ -7,6 +7,46 @@ function buildHistoryWindow(snapshotHistory = [], days = 7) {
   return snapshotHistory.slice(-days);
 }
 
+function buildSundaySummary({ leader, laggard, weeklyWindow, rankedPlatforms, insights, competitor, drafts, scoreChanges, websiteTrend, socialTrend }) {
+  const strongestMover = [...scoreChanges].sort((a, b) => b.scoreDelta - a.scoreDelta)[0];
+  const weakestMover = [...scoreChanges].sort((a, b) => a.scoreDelta - b.scoreDelta)[0];
+  const latest = weeklyWindow[weeklyWindow.length - 1];
+
+  return {
+    title: 'Sunday Summary',
+    headline: `${leader.name} remains the lead growth engine, while ${laggard.name} is the clearest channel to deprioritise or rethink.`,
+    executiveSummary: weeklyWindow.length > 1
+      ? `Over ${weeklyWindow.length} captured day(s), EP Golf Studios held strongest momentum on ${leader.name}. Website demand stayed meaningful, and the best near-term upside is still trust-led fitting content tied to visible outcomes.`
+      : `The first persisted weekly snapshot shows ${leader.name} leading overall performance. The current product is now ready to roll weekly comparisons forward as more history is captured.`,
+    scoreboard: {
+      marketingScore: insights.marketingScore,
+      winningPlatform: leader.name,
+      weakestPlatform: laggard.name,
+      websiteVisitors: websiteTrend.currentVisitors,
+      averageSocialGrowthPct: socialTrend.averageGrowthPct,
+      snapshotCoverageDays: weeklyWindow.length
+    },
+    wins: insights.keyWins,
+    risks: insights.risks,
+    movers: [
+      strongestMover ? `${strongestMover.name} was the strongest mover (${formatChange(strongestMover.scoreDelta)} score).` : 'Waiting for enough history to identify the strongest mover.',
+      weakestMover ? `${weakestMover.name} was the weakest mover (${formatChange(weakestMover.scoreDelta)} score).` : 'Waiting for enough history to identify the weakest mover.'
+    ],
+    actionPlan: insights.recommendedActions.map(action => `${action.title} — ${action.estimatedImpact}`),
+    industryBrief: competitor.highlights,
+    aiBrief: [
+      'The command centre is now storing weekly snapshots, so Sunday summaries can move from static commentary to tracked performance reporting.',
+      'Approval-first action planning remains in place, which means weekly recommendations are ready before any publishing automation is turned on.'
+    ],
+    radarBrief: [
+      `Watch for more demand around ${competitor.trendingTopics[0]}.`,
+      `Turn ${competitor.trendingTopics[1]} into a proof-led content angle next week.`,
+      `Keep an eye on ${latest?.leader?.name || leader.name} style content themes because they are setting the pace right now.`
+    ],
+    contentOps: drafts.map(draft => `${draft.platform}: ${draft.content}`)
+  };
+}
+
 function buildPlatformScoreChanges(window = [], rankedPlatforms = []) {
   if (window.length < 2) return [];
   const first = window[0];
@@ -40,6 +80,27 @@ export const reporting = {
     const socialGrowthSnapshots = weeklyWindow.map(item => item.social?.growthPct || 0);
     const bestScoreMove = [...scoreChanges].sort((a, b) => b.scoreDelta - a.scoreDelta)[0];
     const worstScoreMove = [...scoreChanges].sort((a, b) => a.scoreDelta - b.scoreDelta)[0];
+    const websiteTrend = {
+      currentVisitors: weeklyWindow[weeklyWindow.length - 1]?.website?.visitors || 0,
+      peakVisitors: websiteSnapshots.length ? Math.max(...websiteSnapshots) : 0,
+      averageVisitors: websiteSnapshots.length ? Number((websiteSnapshots.reduce((sum, value) => sum + value, 0) / websiteSnapshots.length).toFixed(0)) : 0
+    };
+    const socialTrend = {
+      averageGrowthPct: socialGrowthSnapshots.length ? Number((socialGrowthSnapshots.reduce((sum, value) => sum + value, 0) / socialGrowthSnapshots.length).toFixed(1)) : 0,
+      latestGrowthPct: weeklyWindow[weeklyWindow.length - 1]?.social?.growthPct || 0
+    };
+    const sunday = buildSundaySummary({
+      leader,
+      laggard,
+      weeklyWindow,
+      rankedPlatforms,
+      insights,
+      competitor,
+      drafts,
+      scoreChanges,
+      websiteTrend,
+      socialTrend
+    });
 
     return {
       daily: {
@@ -76,15 +137,8 @@ export const reporting = {
           bestScoreMove ? `${bestScoreMove.name} made the strongest score move this week (${formatChange(bestScoreMove.scoreDelta)}).` : 'Waiting for enough history to calculate weekly score movement.',
           worstScoreMove ? `${worstScoreMove.name} was the weakest score mover (${formatChange(worstScoreMove.scoreDelta)}), so it deserves a review.` : 'Weekly underperformer tracking will sharpen once more snapshots are captured.'
         ],
-        websiteTrend: {
-          currentVisitors: weeklyWindow[weeklyWindow.length - 1]?.website?.visitors || 0,
-          peakVisitors: websiteSnapshots.length ? Math.max(...websiteSnapshots) : 0,
-          averageVisitors: websiteSnapshots.length ? Number((websiteSnapshots.reduce((sum, value) => sum + value, 0) / websiteSnapshots.length).toFixed(0)) : 0
-        },
-        socialTrend: {
-          averageGrowthPct: socialGrowthSnapshots.length ? Number((socialGrowthSnapshots.reduce((sum, value) => sum + value, 0) / socialGrowthSnapshots.length).toFixed(1)) : 0,
-          latestGrowthPct: weeklyWindow[weeklyWindow.length - 1]?.social?.growthPct || 0
-        },
+        websiteTrend,
+        socialTrend,
         competitorHighlights: competitor.highlights,
         actionPlan: insights.recommendedActions
       },
@@ -99,6 +153,7 @@ export const reporting = {
         historyCoverageDays: monthlyWindow.length,
         draftQueue: drafts.map(d => ({ id: d.id, type: d.type, status: d.status }))
       },
+      sunday,
       history: {
         totalSnapshots: snapshotHistory.length,
         latestSnapshotAt: snapshotHistory[snapshotHistory.length - 1]?.capturedAt || null

@@ -79,6 +79,9 @@ export const orchestrator = {
       weeklyFocus: state.overview.weeklyFocus
     };
   },
+  getSundaySummary(state) {
+    return state.reports.sunday;
+  },
   getDrafts(state) {
     return {
       contentDrafts: state.drafts,
@@ -110,6 +113,13 @@ export const orchestrator = {
       return {
         answer: state.insights.recommendedActions[0].title,
         context: state.insights.recommendedActions
+      };
+    }
+
+    if (q.includes('sunday summary') || q.includes('weekly summary')) {
+      return {
+        answer: state.reports.sunday.headline,
+        context: state.reports.sunday
       };
     }
 

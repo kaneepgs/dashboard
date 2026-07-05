@@ -127,6 +127,7 @@ export default function DashboardClient() {
   const website = overview.website;
   const history = overview.history;
   const weeklyFocus = overview.weeklyFocus;
+  const sundaySummary = overview.sundaySummary;
 
   return (
     <>
@@ -212,6 +213,11 @@ export default function DashboardClient() {
               <div className="panel-head">
                 <h3>Weekly command centre</h3>
                 <span className="badge gold">Sunday summary ready</span>
+              </div>
+              <div className="detail-list sunday-summary-card soft-gap">
+                <h4>{sundaySummary.title}</h4>
+                <p className="soft-gap"><strong>{sundaySummary.headline}</strong></p>
+                <p className="muted soft-gap">{sundaySummary.executiveSummary}</p>
               </div>
               <div className="detail-grid weekly-grid">
                 <div className="detail-list">
@@ -485,6 +491,16 @@ export default function DashboardClient() {
                     <li><strong>Coverage:</strong> {overview.reports.weekly.coverageDays} day(s)</li>
                     <li><strong>Strongest mover:</strong> {overview.reports.weekly.trendNarrative[0]}</li>
                     <li><strong>Weakest mover:</strong> {overview.reports.weekly.trendNarrative[1]}</li>
+                  </ul>
+                </div>
+
+                <div className="report-card">
+                  <strong>{overview.reports.sunday.title}</strong>
+                  <ul>
+                    <li><strong>Headline:</strong> {overview.reports.sunday.headline}</li>
+                    <li><strong>Industry:</strong> {overview.reports.sunday.industryBrief[0]}</li>
+                    <li><strong>AI:</strong> {overview.reports.sunday.aiBrief[0]}</li>
+                    <li><strong>Radar:</strong> {overview.reports.sunday.radarBrief[0]}</li>
                   </ul>
                 </div>
 

@@ -55,6 +55,7 @@ export const dashboard = {
         scoreChanges: reports.weekly.scoreChanges,
         actionPlan: reports.weekly.actionPlan
       },
+      sundaySummary: reports.sunday,
       rankings: rankedPlatforms,
       insights,
       competitor,
