@@ -115,6 +115,7 @@ function buildHtml(overview) {
   const history = overview.history;
   const weeklyFocus = overview.weeklyFocus;
   const sundaySummary = overview.sundaySummary;
+  const executivePack = overview.executivePack;
   const topAction = overview.actionQueue?.[0];
   const selected = overview.rankings[0];
 
@@ -440,6 +441,27 @@ function buildHtml(overview) {
           <span class="badge">Daily / Weekly / Sunday / Monthly</span>
         </div>
         <div class="report-stack">${reportCards}</div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Executive pack</h3>
+          <span class="badge gold">Leadership-ready</span>
+        </div>
+        <div class="detail-list">
+          <h4>${escapeHtml(executivePack.title)}</h4>
+          <p class="soft-gap"><strong>${escapeHtml(executivePack.headline)}</strong></p>
+          <p class="muted soft-gap">${escapeHtml(executivePack.executiveSummary)}</p>
+          <ul>
+            <li><strong>Approved actions:</strong> ${escapeHtml(executivePack.approvedActionCount)}</li>
+            <li><strong>Pending actions:</strong> ${escapeHtml(executivePack.pendingActionCount)}</li>
+            <li><strong>Generated:</strong> ${escapeHtml(formatDate(executivePack.generatedAt))}</li>
+          </ul>
+          <h4 class="soft-gap-lg">Priority drafts</h4>
+          <ul>${renderList((executivePack.priorityDrafts || []).map(item => `${item.platform} — ${item.headline}`))}</ul>
+          <h4 class="soft-gap-lg">Combined brief</h4>
+          <pre class="summary-pack-copy soft-gap">${escapeHtml(executivePack.combinedBrief)}</pre>
+        </div>
       </div>
 
       <div class="panel">

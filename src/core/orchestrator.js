@@ -83,6 +83,9 @@ export const orchestrator = {
   getSundaySummary(state) {
     return state.reports.sunday;
   },
+  getExecutivePack(state) {
+    return state.overview.executivePack;
+  },
   getDrafts(state) {
     return {
       contentDrafts: state.drafts,
@@ -122,6 +125,13 @@ export const orchestrator = {
       return {
         answer: state.reports.sunday.headline,
         context: state.reports.sunday
+      };
+    }
+
+    if (q.includes('executive pack') || q.includes('executive summary pack')) {
+      return {
+        answer: state.overview.executivePack.headline,
+        context: state.overview.executivePack
       };
     }
 

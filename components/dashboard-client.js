@@ -151,6 +151,7 @@ export default function DashboardClient() {
   const weeklyFocus = overview.weeklyFocus;
   const sundaySummary = overview.sundaySummary;
   const sundayPack = sundaySummary.pack;
+  const executivePack = overview.executivePack;
 
   return (
     <>
@@ -566,6 +567,36 @@ export default function DashboardClient() {
                     <li><strong>History coverage:</strong> {overview.reports.monthly.historyCoverageDays} day(s)</li>
                   </ul>
                 </div>
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Executive pack</h3>
+                <span className="badge gold">Leadership-ready</span>
+              </div>
+              <div className="detail-list summary-pack-card">
+                <div className="inline-between">
+                  <h4>{executivePack.title}</h4>
+                  <button className="ghost-btn" onClick={() => handleCopy('executive-pack', executivePack.combinedBrief)}>
+                    {copiedKey === 'executive-pack' ? 'Copied' : 'Copy pack'}
+                  </button>
+                </div>
+                <p className="soft-gap"><strong>{executivePack.headline}</strong></p>
+                <p className="muted soft-gap">{executivePack.executiveSummary}</p>
+                <ul className="soft-gap">
+                  <li><strong>Approved actions:</strong> {executivePack.approvedActionCount}</li>
+                  <li><strong>Pending actions:</strong> {executivePack.pendingActionCount}</li>
+                  <li><strong>Generated:</strong> {formatDate(executivePack.generatedAt)}</li>
+                </ul>
+              </div>
+              <div className="detail-list soft-gap-lg">
+                <h4>Priority drafts</h4>
+                <ul>
+                  {executivePack.priorityDrafts.map(item => (
+                    <li key={item.id}><strong>{item.platform}</strong> — {item.headline}</li>
+                  ))}
+                </ul>
               </div>
             </div>
 

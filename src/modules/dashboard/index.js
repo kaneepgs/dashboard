@@ -24,6 +24,43 @@ function buildHistorySummary(snapshotHistory = []) {
   };
 }
 
+function buildExecutivePack(system, reports, actionQueue = [], drafts = []) {
+  const approvedActions = actionQueue.filter(action => action.status === 'Approved');
+  const priorityDrafts = drafts.slice(0, 3).map(draft => ({
+    id: draft.id,
+    platform: draft.platform,
+    type: draft.type,
+    headline: draft.content,
+    cta: draft.cta,
+    repurposeNote: draft.repurposeNote
+  }));
+
+  return {
+    title: 'Executive Pack',
+    generatedAt: system.lastUpdated,
+    headline: reports.sunday.headline,
+    executiveSummary: reports.sunday.executiveSummary,
+    approvedActionCount: approvedActions.length,
+    pendingActionCount: actionQueue.length - approvedActions.length,
+    approvedActions,
+    priorityDrafts,
+    sundaySummaryPack: reports.sunday.pack,
+    combinedBrief: [
+      'EP GOLF STUDIOS EXECUTIVE PACK',
+      `Generated: ${system.lastUpdated}`,
+      '',
+      `Headline: ${reports.sunday.headline}`,
+      reports.sunday.executiveSummary,
+      '',
+      `Approved actions: ${approvedActions.length}`,
+      ...approvedActions.map(action => `- ${action.title} (${action.estimatedImpact})`),
+      '',
+      'Priority drafts:',
+      ...priorityDrafts.map(draft => `- ${draft.platform} / ${draft.type}: ${draft.headline}`)
+    ].join('\n')
+  };
+}
+
 export const dashboard = {
   buildOverview(system, rankedPlatforms, insights, competitor, reports, drafts, actionQueue, snapshotHistory = []) {
     const socialPlatforms = rankedPlatforms.filter(p => p.slug !== 'ga4');
@@ -56,6 +93,7 @@ export const dashboard = {
         actionPlan: reports.weekly.actionPlan
       },
       sundaySummary: reports.sunday,
+      executivePack: buildExecutivePack(system, reports, actionQueue, drafts),
       rankings: rankedPlatforms,
       insights,
       competitor,
