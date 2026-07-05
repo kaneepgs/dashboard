@@ -72,6 +72,7 @@ export default function DashboardClient() {
   const [command, setCommand] = useState('');
   const [commandResult, setCommandResult] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [copiedKey, setCopiedKey] = useState('');
 
   async function loadOverview() {
     const response = await fetch('/api/overview', { cache: 'no-store' });
@@ -113,6 +114,13 @@ export default function DashboardClient() {
     setCommandResult(data.answer || 'No answer available.');
   }
 
+  async function handleCopy(key, value) {
+    if (!value) return;
+    await navigator.clipboard.writeText(value);
+    setCopiedKey(key);
+    window.setTimeout(() => setCopiedKey(current => current === key ? '' : current), 1800);
+  }
+
   if (!overview) {
     return (
       <main className="loading-shell">
@@ -130,6 +138,7 @@ export default function DashboardClient() {
   const history = overview.history;
   const weeklyFocus = overview.weeklyFocus;
   const sundaySummary = overview.sundaySummary;
+  const sundayPack = sundaySummary.pack;
 
   return (
     <>
@@ -520,6 +529,60 @@ export default function DashboardClient() {
                     <li><strong>History coverage:</strong> {overview.reports.monthly.historyCoverageDays} day(s)</li>
                   </ul>
                 </div>
+              </div>
+            </div>
+
+            <div className="panel">
+              <div className="panel-head">
+                <h3>Sunday summary pack</h3>
+                <span className="badge gold">Ready to reuse</span>
+              </div>
+              <div className="summary-pack-grid">
+                <div className="detail-list summary-pack-card">
+                  <div className="inline-between">
+                    <h4>Email subject</h4>
+                    <button className="ghost-btn" onClick={() => handleCopy('email-subject', sundayPack.emailSubject)}>
+                      {copiedKey === 'email-subject' ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                  <p className="muted soft-gap">{sundayPack.emailSubject}</p>
+                </div>
+
+                <div className="detail-list summary-pack-card">
+                  <div className="inline-between">
+                    <h4>Executive email</h4>
+                    <button className="ghost-btn" onClick={() => handleCopy('executive-email', sundayPack.executiveEmail)}>
+                      {copiedKey === 'executive-email' ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                  <pre className="summary-pack-copy soft-gap">{sundayPack.executiveEmail}</pre>
+                </div>
+
+                <div className="detail-list summary-pack-card">
+                  <div className="inline-between">
+                    <h4>WhatsApp summary</h4>
+                    <button className="ghost-btn" onClick={() => handleCopy('whatsapp-summary', sundayPack.whatsappSummary)}>
+                      {copiedKey === 'whatsapp-summary' ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                  <p className="muted soft-gap">{sundayPack.whatsappSummary}</p>
+                </div>
+
+                <div className="detail-list summary-pack-card">
+                  <div className="inline-between">
+                    <h4>Internal brief</h4>
+                    <button className="ghost-btn" onClick={() => handleCopy('internal-brief', sundayPack.internalBrief)}>
+                      {copiedKey === 'internal-brief' ? 'Copied' : 'Copy'}
+                    </button>
+                  </div>
+                  <pre className="summary-pack-copy soft-gap">{sundayPack.internalBrief}</pre>
+                </div>
+              </div>
+              <div className="detail-list soft-gap-lg">
+                <h4>Next-week content focus</h4>
+                <ul>
+                  {sundayPack.nextWeekFocus.map(item => <li key={item}>{item}</li>)}
+                </ul>
               </div>
             </div>
 

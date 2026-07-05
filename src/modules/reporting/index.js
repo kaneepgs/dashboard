@@ -7,6 +7,38 @@ function buildHistoryWindow(snapshotHistory = [], days = 7) {
   return snapshotHistory.slice(-days);
 }
 
+function buildSundaySummaryPack({ leader, laggard, weeklyWindow, websiteTrend, socialTrend, sundaySummary }) {
+  const coverageLabel = weeklyWindow.length > 1 ? `${weeklyWindow.length} captured day(s)` : 'the first captured weekly snapshot';
+  const actionLines = sundaySummary.actionPlan.slice(0, 3).map(item => `- ${item}`).join('\n');
+
+  return {
+    emailSubject: `EP Golf Studios Sunday Summary — ${leader.name} leads, ${laggard.name} needs attention`,
+    executiveEmail: [
+      `Headline: ${sundaySummary.headline}`,
+      '',
+      sundaySummary.executiveSummary,
+      '',
+      `Coverage: ${coverageLabel}`,
+      `Website visitors: ${websiteTrend.currentVisitors}`,
+      `Average social growth: ${socialTrend.averageGrowthPct}%`,
+      '',
+      'Top actions:',
+      actionLines
+    ].join('\n'),
+    whatsappSummary: `${sundaySummary.headline} Website visitors: ${websiteTrend.currentVisitors}. Avg social growth: ${socialTrend.averageGrowthPct}%. Next move: ${sundaySummary.actionPlan[0]}`,
+    internalBrief: [
+      'SUNDAY SUMMARY PACK',
+      `Winning platform: ${leader.name}`,
+      `Weakest platform: ${laggard.name}`,
+      `Weekly coverage: ${coverageLabel}`,
+      `Strongest win: ${sundaySummary.wins[0]}`,
+      `Top risk: ${sundaySummary.risks[0]}`,
+      `Priority action: ${sundaySummary.actionPlan[0]}`
+    ].join('\n'),
+    nextWeekFocus: sundaySummary.contentOps.slice(0, 3)
+  };
+}
+
 function buildSundaySummary({ leader, laggard, weeklyWindow, rankedPlatforms, insights, competitor, drafts, scoreChanges, websiteTrend, socialTrend }) {
   const strongestMover = [...scoreChanges].sort((a, b) => b.scoreDelta - a.scoreDelta)[0];
   const weakestMover = [...scoreChanges].sort((a, b) => a.scoreDelta - b.scoreDelta)[0];
@@ -101,6 +133,14 @@ export const reporting = {
       websiteTrend,
       socialTrend
     });
+    const sundayPack = buildSundaySummaryPack({
+      leader,
+      laggard,
+      weeklyWindow,
+      websiteTrend,
+      socialTrend,
+      sundaySummary: sunday
+    });
 
     return {
       daily: {
@@ -153,7 +193,10 @@ export const reporting = {
         historyCoverageDays: monthlyWindow.length,
         draftQueue: drafts.map(d => ({ id: d.id, type: d.type, status: d.status }))
       },
-      sunday,
+      sunday: {
+        ...sunday,
+        pack: sundayPack
+      },
       history: {
         totalSnapshots: snapshotHistory.length,
         latestSnapshotAt: snapshotHistory[snapshotHistory.length - 1]?.capturedAt || null

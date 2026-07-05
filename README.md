@@ -49,6 +49,7 @@ Historical reporting status:
 - Weekly reports can now build from captured history instead of only the current state
 - The dashboard UI now surfaces a weekly command-centre layer, snapshot timeline, and score-movement view
 - A dedicated Sunday Summary output is now available in-app and via `GET /api/sunday-summary`
+- A reusable Sunday Summary pack is now available in-app and via `GET /api/sunday-summary-pack`
 - Managed OpenClaw is treated as a separate external workspace, launched from the dashboard via an `Open OpenClaw` link instead of an embedded iframe
 
 ## Quick start

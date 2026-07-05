@@ -242,6 +242,7 @@ function buildHtml(overview) {
     .weekly-grid { display:grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
     .sunday-summary-card { border: 1px solid var(--border); background: rgba(255,255,255,0.03); border-radius: 16px; padding: 16px; }
     .timeline-metrics { display:flex; gap:10px; flex-wrap:wrap; color: var(--muted); font-size: 13px; }
+    .summary-pack-copy { white-space: pre-wrap; word-break: break-word; font: inherit; color: var(--text); margin: 0; }
     .footer-note { margin-top: 20px; color: var(--muted); font-size: 12px; }
     @media (max-width: 1100px) {
       .hero-grid, .content-grid, .weekly-grid, .columns-4, .timeline-grid, .detail-metric-grid { grid-template-columns: 1fr; }
@@ -440,19 +441,18 @@ function buildHtml(overview) {
 
       <div class="panel">
         <div class="panel-head">
-          <h3>Sunday summary</h3>
-          <span class="badge gold">Executive weekly output</span>
+          <h3>Sunday summary pack</h3>
+          <span class="badge gold">Ready to reuse</span>
         </div>
         <div class="detail-list">
-          <h4>Scoreboard</h4>
-          <ul>
-            <li><strong>Winning platform:</strong> ${escapeHtml(sundaySummary.scoreboard.winningPlatform)}</li>
-            <li><strong>Weakest platform:</strong> ${escapeHtml(sundaySummary.scoreboard.weakestPlatform)}</li>
-            <li><strong>Website visitors:</strong> ${escapeHtml(formatNumber(sundaySummary.scoreboard.websiteVisitors))}</li>
-            <li><strong>Average social growth:</strong> ${escapeHtml(formatPct(sundaySummary.scoreboard.averageSocialGrowthPct))}</li>
-          </ul>
-          <h4 class="soft-gap-lg">Industry / AI / Radar</h4>
-          <ul>${renderList([...(sundaySummary.industryBrief || []), ...(sundaySummary.aiBrief || []), ...(sundaySummary.radarBrief || [])])}</ul>
+          <h4>Email subject</h4>
+          <p class="muted soft-gap">${escapeHtml(sundaySummary.pack.emailSubject)}</p>
+          <h4 class="soft-gap-lg">Executive email</h4>
+          <pre class="summary-pack-copy soft-gap">${escapeHtml(sundaySummary.pack.executiveEmail)}</pre>
+          <h4 class="soft-gap-lg">WhatsApp summary</h4>
+          <p class="muted soft-gap">${escapeHtml(sundaySummary.pack.whatsappSummary)}</p>
+          <h4 class="soft-gap-lg">Next-week content focus</h4>
+          <ul>${renderList(sundaySummary.pack.nextWeekFocus || [])}</ul>
         </div>
       </div>
 
