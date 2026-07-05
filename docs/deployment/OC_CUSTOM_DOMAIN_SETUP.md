@@ -1,16 +1,16 @@
-# OpenClaw custom domain setup for oc.epgolfstudios.co.uk
+# OpenClaw custom domain setup for oc.epgolfescape.co.uk
 
 ## Goal
 Serve OpenClaw Control UI from:
 
-- `https://oc.epgolfstudios.co.uk`
+- `https://oc.epgolfescape.co.uk`
 
 This should replace the Hostinger preview domain path that is currently injecting iframe-blocking headers on canvas/embed routes.
 
 ## What is already prepared
 
 - OpenClaw `gateway.controlUi.allowedOrigins` now includes:
-  - `https://oc.epgolfstudios.co.uk`
+  - `https://oc.epgolfescape.co.uk`
 - The dashboard app itself is ready.
 - The Sunday summary layer is live in the product.
 
@@ -20,7 +20,7 @@ Use a real HTTPS reverse proxy in front of OpenClaw.
 
 ### Preferred shape
 
-- Public HTTPS endpoint: `oc.epgolfstudios.co.uk`
+- Public HTTPS endpoint: `oc.epgolfescape.co.uk`
 - Reverse proxy: Caddy or nginx
 - Upstream OpenClaw gateway: `http://127.0.0.1:18789`
 - Keep OpenClaw gateway bound locally unless the proxy requires a LAN bind.
@@ -51,7 +51,7 @@ Use the existing OpenClaw auth path first.
 ## Caddy example
 
 ```caddy
-oc.epgolfstudios.co.uk {
+oc.epgolfescape.co.uk {
     encode gzip zstd
 
     reverse_proxy 127.0.0.1:18789 {
@@ -74,7 +74,7 @@ oc.epgolfstudios.co.uk {
 ```nginx
 server {
     listen 443 ssl http2;
-    server_name oc.epgolfstudios.co.uk;
+    server_name oc.epgolfescape.co.uk;
 
     ssl_certificate     /path/to/fullchain.pem;
     ssl_certificate_key /path/to/privkey.pem;
@@ -95,7 +95,7 @@ server {
 
 ## DNS
 
-Point `oc.epgolfstudios.co.uk` at the machine or proxy that terminates HTTPS for OpenClaw.
+Point `oc.epgolfescape.co.uk` at the machine or proxy that terminates HTTPS for OpenClaw.
 
 Typical options:
 
@@ -107,7 +107,7 @@ Typical options:
 
 Once the proxy exists, verify:
 
-1. `https://oc.epgolfstudios.co.uk/chat?session=main` loads
+1. `https://oc.epgolfescape.co.uk/chat?session=main` loads
 2. login / Control UI connection works over HTTPS
 3. a hosted canvas document under `/__openclaw__/canvas/...` no longer returns proxy-added `X-Frame-Options: DENY`
 4. dashboard embed renders in chat
